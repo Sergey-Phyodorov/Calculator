@@ -1,0 +1,10 @@
+{
+    "tabWidth": 4,
+    "useTabs": true,
+    "trailingComma": "all",
+    "semi": true,
+    "bracketSpacing": true,
+    "bracketSameLine": true,
+    "arrowParens": "always",
+    "htmlWhitespaceSensitivity": "strict"
+}
