@@ -8,20 +8,15 @@ function createCalcBody(numbersButtons, functionsButtons) {
   // Итерация по функциональным кнопкам
   functionsButtons.forEach((func, index) => {
     if (index <= 3) {
-      // Если индекс меньше или равен 3, добавляем функциональную кнопку в тело калькулятора
       calculatorBody.push(func);
     } else if (index === 4) {
-      // Если индекс равен 4, итерируемся по числовым кнопкам
       numbersButtons.forEach((number, index) => {
         if (index <= 2) {
-          // Если индекс числовой кнопки меньше или равен 2, добавляем ее в тело калькулятора
           calculatorBody.push(number);
         }
       });
-      // Добавляем функциональную кнопку в тело калькулятора
       calculatorBody.push(func);
     } else if (index === 5) {
-      // Аналогично для индекса 5
       numbersButtons.forEach((number, index) => {
         if (index >= 3 && index <= 5) {
           calculatorBody.push(number);
@@ -29,7 +24,6 @@ function createCalcBody(numbersButtons, functionsButtons) {
       });
       calculatorBody.push(func);
     } else if (index === 6) {
-      // Аналогично для индекса 6
       numbersButtons.forEach((number, index) => {
         if (index >= 6 && index <= 8) {
           calculatorBody.push(number);
@@ -37,7 +31,6 @@ function createCalcBody(numbersButtons, functionsButtons) {
       });
       calculatorBody.push(func);
     } else if (index === 7) {
-      // Аналогично для индекса 7
       numbersButtons.forEach((number, index) => {
         if (index >= 9 && index <= 11) {
           calculatorBody.push(number);
@@ -45,7 +38,6 @@ function createCalcBody(numbersButtons, functionsButtons) {
       });
       calculatorBody.push(func);
     } else if (index === 8) {
-      // Аналогично для индекса 8
       numbersButtons.forEach((number, index) => {
         if (index === 10) {
           calculatorBody.push(number);
@@ -58,6 +50,144 @@ function createCalcBody(numbersButtons, functionsButtons) {
   return calculatorBody;
 }
 
+// Функция валидации вычислительных процессов
+function calculatorValidation(inValue) {
+  const strMathematicalExpression = inValue.toString().trim();
+
+  if (
+    typeof strMathematicalExpression === "string" &&
+    strMathematicalExpression.length
+  ) {
+    let arrMathematicalExpression = Array.from(strMathematicalExpression);
+
+    // Удаляем все пробелы
+    arrMathematicalExpression = arrMathematicalExpression.filter(
+      (item) => item !== " ",
+    );
+
+    const resultArrMathematicalExpression = arrMathematicalExpression.reduce(
+      (accumulator, currentValue) => {
+        if (!isNaN(currentValue) || currentValue === ".") {
+          if (
+            typeof accumulator[accumulator.length - 1] === "string" &&
+            (!isNaN(accumulator[accumulator.length - 1]) ||
+              accumulator[accumulator.length - 1].endsWith("."))
+          ) {
+            accumulator[accumulator.length - 1] += currentValue;
+          } else {
+            accumulator.push(currentValue.toString());
+          }
+        } else {
+          if (
+            typeof accumulator[accumulator.length - 1] === "string" &&
+            !isNaN(accumulator[accumulator.length - 1])
+          ) {
+            accumulator[accumulator.length - 1] = parseFloat(
+              accumulator[accumulator.length - 1],
+            );
+          }
+          accumulator.push(currentValue);
+        }
+        return accumulator;
+      },
+      [],
+    );
+
+    // Если последний элемент является строкой и представляет число, преобразуем его в число
+    if (
+      typeof resultArrMathematicalExpression[
+        resultArrMathematicalExpression.length - 1
+      ] === "string" &&
+      !isNaN(
+        resultArrMathematicalExpression[
+          resultArrMathematicalExpression.length - 1
+        ],
+      )
+    ) {
+      resultArrMathematicalExpression[
+        resultArrMathematicalExpression.length - 1
+      ] = parseFloat(
+        resultArrMathematicalExpression[
+          resultArrMathematicalExpression.length - 1
+        ],
+      );
+    }
+
+    console.log(
+      "resultArrMathematicalExpression",
+      resultArrMathematicalExpression,
+    );
+    return resultArrMathematicalExpression;
+  } else {
+    return console.log(
+      "Получен пустой String или не String",
+      strMathematicalExpression,
+    );
+  }
+}
+
+// calculatorValidation("-123 + 3 3 - 1 . 5 +4.5- 5. 3--");
+
+// Функция логической работы вычислительных процессов калькулятора
+function calculatorLogic(inValue) {
+  if (Array.isArray(inValue) && inValue.length) {
+    // Проверка, состоит ли массив только из числовых значений
+    if (inValue.every((item) => typeof item === "number")) {
+      return console.log("Результат:", inValue[0]);
+    }
+
+    // Обработка последовательных минусов перед числом
+    let i = 0;
+    while (inValue[i] === "-" || inValue[i] === "+") {
+      if (inValue[i] === "-") {
+        inValue[i + 1] = -inValue[i + 1];
+      }
+      i++;
+    }
+
+    // Удаляем обработанные минусы и плюсы
+    inValue = inValue.slice(i);
+
+    let result = inValue[0];
+    let currentOperator = null;
+
+    for (i = 1; i < inValue.length; i++) {
+      const currentValue = inValue[i];
+
+      if (typeof currentValue === "number" && currentOperator) {
+        switch (currentOperator) {
+          case "+":
+            result += currentValue;
+            break;
+          case "-":
+            result -= currentValue;
+            break;
+          // Добавьте другие операторы, если это необходимо (например, умножение и деление)
+          default:
+            console.log("Неизвестный оператор:", currentOperator);
+            break;
+        }
+        currentOperator = null; // Сбрасываем текущий оператор после использования
+      } else {
+        currentOperator = currentValue; // Устанавливаем текущий оператор
+      }
+    }
+
+    // return console.log("Результат:", result);
+    return result;
+  } else {
+    if (Array.isArray(inValue)) {
+      return console.log("Получен пустой Array", inValue.length);
+    } else {
+      return console.log(
+        "Полученные данные не Array. Тип данных:",
+        "inValue",
+        typeof inValue,
+      );
+    }
+  }
+}
+
 function App() {
   const calcNumbers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
   const calcFunctions = ["C", "+/-", "%", "/", "*", "-", "+", ".", "="];
@@ -65,13 +195,6 @@ function App() {
   const [startDisplay, setDisplay] = useState("");
   const [mathOperation, setMathOperation] = useState(false);
   const [mathResultDisplay, setMathResultDisplay] = useState(false);
-
-  // Функция для вычисления математического выражения
-  function mathEval(inValue) {
-    setMathOperation(!mathOperation);
-    console.log(mathOperation);
-    return eval(inValue);
-  }
 
   // Функция для вывода значения на дисплей калькулятора
   function outputCalculatorDisplay(inValue) {
@@ -100,8 +223,9 @@ function App() {
         setMathOperation((prev) => !prev);
       }
     } else if (enterButton === "=") {
-      const result = mathEval(startDisplay);
+      const result = calculatorLogic(calculatorValidation(startDisplay));
       setDisplay(() => "");
+      setMathOperation(!mathOperation);
       if (!mathResultDisplay) {
         setMathResultDisplay((prev) => !prev);
       }
